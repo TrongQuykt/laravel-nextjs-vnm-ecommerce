@@ -163,7 +163,7 @@ const Navbar = () => {
               { name: 'Thương hiệu', href: '/', hasSub: true },
               { name: 'Luôn vui khỏe', href: '/tin-tuc', hasSub: false },
               { name: 'Nhận quà', href: '/vinamilk-rewards', hasSub: false },
-              { name: 'Vinamilk Care', href: '/', hasSub: false },
+              { name: 'Vinamilk Care', href: '/care', hasSub: false },
             ].map((item) => (
               <div key={item.name} className="group relative">
                 <Link

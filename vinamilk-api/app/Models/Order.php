@@ -12,7 +12,9 @@ class Order extends Model
     protected $fillable = [
         "tenant_id", 
         "user_id", 
-        "order_number", 
+        "order_number",
+        "order_type",
+        "care_subscription_id",
         "status", 
         "delivery_type",
         "store_id",
@@ -61,4 +63,5 @@ class Order extends Model
     public function payment() { return $this->hasOne(Payment::class); }
     public function store() { return $this->belongsTo(Store::class); }
     public function shippingMethod() { return $this->belongsTo(ShippingMethod::class); }
+    public function careSubscription() { return $this->belongsTo(CareSubscription::class); }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\PromotionBanner;
+use App\Models\PromotionsPageBanner;
 use App\Models\PromotionCampaign;
 use App\Models\PromotionFlashSale;
 use App\Models\PromotionTerm;
@@ -121,12 +122,13 @@ class PromotionController extends Controller
     }
 
     /**
-     * Get banners for the /promotions public page (is_shown_on_promotions_page = true)
+     * Banners for the public /promotions page (Bento grid).
      */
     public function promotionsPageBanners()
     {
-        $banners = PromotionBanner::where('is_active', true)
-            ->where('is_shown_on_promotions_page', true)
+        $banners = PromotionsPageBanner::where('is_active', true)
+            ->with('promotionBanner:id')
+            ->orderByRaw("CASE layout_slot WHEN 'hero' THEN 0 WHEN 'side' THEN 1 ELSE 2 END")
             ->orderBy('sort_order')
             ->get()
             ->map(function ($banner) {

@@ -308,6 +308,10 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\BadgeColumn::make('order_type')
+                    ->label('Loại')
+                    ->colors(['primary' => 'care', 'gray' => 'standard'])
+                    ->formatStateUsing(fn ($s) => $s === 'care' ? 'Vinamilk Care' : 'Thường'),
                 Tables\Columns\TextColumn::make('order_number')
                     ->searchable()
                     ->sortable()

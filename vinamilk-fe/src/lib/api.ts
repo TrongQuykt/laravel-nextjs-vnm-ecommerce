@@ -55,7 +55,7 @@ export const catalogApi = {
   getPromotions: () =>
     fetchApi<import('../types').PromotionPageData>('/promotions', { next: { revalidate: 60 } }),
   getPromotionsPageBanners: () =>
-    fetchApi<{ banners: import('../types').PromotionBanner[] }>('/promotions-page-banners', { next: { revalidate: 60 } }),
+    fetchApi<{ banners: import('../types').PromotionsPageBanner[] }>('/promotions-page-banners', { next: { revalidate: 60 } }),
   evaluateCart: (payload: { items: any[], coupon_code?: string, payment_method?: string }) =>
     fetchApi<any>('/cart/evaluate', {
       method: 'POST',
@@ -67,6 +67,25 @@ export const catalogApi = {
     fetchApi<any>('/shipping/calculate-fee', {
       method: 'POST',
       body: JSON.stringify(payload),
+    }),
+};
+
+export const careApi = {
+  getPage: () => fetchApi<{ settings: import('../types/care').CarePageSettings; delivery_options: import('../types/care').CareDeliveryOption[] }>('/care', { next: { revalidate: 60 } }),
+  getProducts: () => fetchApi<{ products: import('../types/care').CareProduct[] }>('/care/products', { next: { revalidate: 60 } }),
+  getGreetingCards: () => fetchApi<{ cards: import('../types/care').CareGreetingCard[] }>('/care/greeting-cards'),
+  calculate: (data: {
+    care_product_id: number;
+    variant_id: number;
+    quantity: number;
+    delivery_count: number;
+    first_delivery_date?: string;
+  }) =>
+    fetchApi<import('../types/care').CarePricing>('/care/calculate', { method: 'POST', body: JSON.stringify(data) }),
+  checkout: (data: Record<string, unknown>) =>
+    authFetchApi<{ success: boolean; order_number: string; payment_url?: string }>('/care/checkout', {
+      method: 'POST',
+      body: JSON.stringify(data),
     }),
 };
 

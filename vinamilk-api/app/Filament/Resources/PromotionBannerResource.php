@@ -85,10 +85,6 @@ class PromotionBannerResource extends Resource
                     Forms\Components\Toggle::make('is_active')
                         ->label('Đang hoạt động')
                         ->default(true),
-                    Forms\Components\Toggle::make('is_shown_on_promotions_page')
-                        ->label('Hiển thị trên trang Ưu Đãi (/promotions)')
-                        ->helperText('Bật để banner này xuất hiện trong lưới Banner Bento ở trang /promotions.')
-                        ->default(false),
                 ])->columns(2),
 
             Forms\Components\Section::make('Cấu hình tương tác')

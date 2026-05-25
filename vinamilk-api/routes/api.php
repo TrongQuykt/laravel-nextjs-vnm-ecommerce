@@ -48,6 +48,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/forgot-password', [UserController::class, 'forgotPassword']);
     Route::get('/promotions', [\App\Http\Controllers\Api\PromotionController::class, 'index']);
     Route::get('/promotions-page-banners', [\App\Http\Controllers\Api\PromotionController::class, 'promotionsPageBanners']);
+    Route::get('/care', [\App\Http\Controllers\Api\CareController::class, 'page']);
+    Route::get('/care/products', [\App\Http\Controllers\Api\CareController::class, 'products']);
+    Route::get('/care/greeting-cards', [\App\Http\Controllers\Api\CareController::class, 'greetingCards']);
+    Route::post('/care/calculate', [\App\Http\Controllers\Api\CareController::class, 'calculate']);
     Route::get('/stores', [\App\Http\Controllers\Api\StoreController::class, 'index']);
     Route::get('/shipping-methods', [\App\Http\Controllers\Api\ShippingMethodController::class, 'index']);
     Route::post('/shipping/calculate-fee', [\App\Http\Controllers\Api\ShippingMethodController::class, 'calculateFee']);
@@ -82,6 +86,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     // Sales
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders/checkout', [OrderController::class, 'checkout']);
+    Route::post('/care/checkout', [\App\Http\Controllers\Api\CareController::class, 'checkout']);
     Route::get('/orders/{number}', [OrderController::class, 'show']);
 
     // Loyalty / Membership

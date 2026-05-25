@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getImageUrl } from "@/lib/api";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
-export function ProductGallery({ mainImage, images = [] }: { mainImage: string | null; images?: ProductImage[] }) {
+export function ProductGallery({ mainImage, images = [], hideThumbnails = false }: { mainImage: string | null; images?: ProductImage[], hideThumbnails?: boolean }) {
   const allImages = [
     { id: -1, path: mainImage, type: 'main' as const },
     ...(images || []).filter(img => img.path !== mainImage)
@@ -158,7 +158,8 @@ export function ProductGallery({ mainImage, images = [] }: { mainImage: string |
       </div>
 
       {/* Thumbnails */}
-      <div className="flex gap-1 overflow-x-auto pb-4 pt-2 scrollbar-hide px-2 items-center">
+      {!hideThumbnails && (
+        <div className="flex gap-1 overflow-x-auto pb-4 pt-2 scrollbar-hide px-2 items-center">
         {allImages.map((img, i) => (
           <button
             key={i}
@@ -176,6 +177,7 @@ export function ProductGallery({ mainImage, images = [] }: { mainImage: string |
           </button>
         ))}
       </div>
+      )}
 
       {/* Lightbox Modal */}
       <AnimatePresence>

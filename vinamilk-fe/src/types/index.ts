@@ -194,6 +194,26 @@ export interface PromotionBanner {
   is_active: boolean;
 }
 
+/** Banner Bento trên trang /promotions — quản trị riêng trong admin */
+export interface PromotionsPageBanner {
+  id: number;
+  promotion_banner_id: number | null;
+  title: string;
+  subtitle: string | null;
+  image_path: string;
+  layout_slot: 'hero' | 'side' | 'extra';
+  type: 'link' | 'modal';
+  link_url: string | null;
+  button_text: string | null;
+  modal_title: string | null;
+  modal_content: string | null;
+  modal_table_data: PromotionBanner['modal_table_data'];
+  modal_products_limit: number;
+  modal_image_path: string | null;
+  sort_order: number;
+  is_active: boolean;
+}
+
 export interface PromotionPageSetting {
   id: number;
   hero_image_path: string | null;

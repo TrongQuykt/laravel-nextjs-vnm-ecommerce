@@ -352,6 +352,12 @@ class OrderController extends Controller
             'payment_status' => 'paid',
         ]);
 
+        if ($order->order_type === 'care' && $order->care_subscription_id) {
+            \App\Models\CareSubscription::where('id', $order->care_subscription_id)
+                ->where('status', 'pending_payment')
+                ->update(['status' => 'active']);
+        }
+
         // Find or create the payment transaction log entry
         $log = \App\Models\PaymentLog::firstOrCreate(
             ['order_number' => $orderNumber],

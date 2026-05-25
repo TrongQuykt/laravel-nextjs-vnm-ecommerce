@@ -48,13 +48,12 @@ export default async function PromotionsPage({
           <div className="flex items-end justify-between mb-8">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3">
-                <Tag size={28} className="text-[#001c9a]" strokeWidth={1.5} />
-                <h1 className="text-4xl md:text-6xl font-serif text-[#001c9a] flex items-start gap-1">
+                
+                <h1 className="text-4xl md:text-6xl font-bold text-[#001c9a] flex items-start gap-1">
                   Ưu Đãi
                   <span className="text-xl md:text-2xl mt-1 ml-1">{totalProducts}</span>
                 </h1>
               </div>
-              <p className="text-[#001c9a]/50 text-sm">Các sản phẩm đang được giảm giá, sắp xếp theo % giảm cao nhất</p>
             </div>
           </div>
 

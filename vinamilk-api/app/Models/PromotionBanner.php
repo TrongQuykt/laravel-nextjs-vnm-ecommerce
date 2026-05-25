@@ -13,7 +13,6 @@ class PromotionBanner extends Model
 
     protected $casts = [
         'is_active'                    => 'boolean',
-        'is_shown_on_promotions_page'  => 'boolean',
         'start_date'                   => 'date',
         'end_date'                     => 'date',
         'modal_table_data'             => 'array',

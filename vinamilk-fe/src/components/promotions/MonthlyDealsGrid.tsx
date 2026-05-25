@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PromotionBanner, Product } from "@/types";
 import { getImageUrl } from "@/lib/api";
+import { findPromotionBannerFromUrl } from "@/lib/promotionBanner";
 import { PromotionModal } from "./PromotionModal";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSearchParams } from "next/navigation";
 
 interface MonthlyDealsGridProps {
   banners: PromotionBanner[];
@@ -77,6 +79,24 @@ const BannerCard = ({
 
 export const MonthlyDealsGrid = ({ banners, modalProducts }: MonthlyDealsGridProps) => {
   const [selectedBanner, setSelectedBanner] = useState<PromotionBanner | null>(null);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (!banners?.length) return;
+
+    const fromQuery = findPromotionBannerFromUrl(
+      banners,
+      searchParams.get("banner"),
+      typeof window !== "undefined" ? window.location.hash.slice(1) : ""
+    );
+
+    if (fromQuery) {
+      setSelectedBanner(fromQuery);
+      requestAnimationFrame(() => {
+        document.getElementById("deals")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, [banners, searchParams]);
 
   if (!banners || banners.length === 0) return null;
 

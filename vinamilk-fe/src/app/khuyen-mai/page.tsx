@@ -7,6 +7,7 @@ import { PromotionTerms } from "@/components/promotions/PromotionTerms";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export const revalidate = 60;
 
@@ -59,10 +60,12 @@ export default async function KhuyenMaiPage() {
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <MonthlyDealsGrid
-                banners={data.banners}
-                modalProducts={data.modal_products}
-              />
+              <Suspense fallback={null}>
+                <MonthlyDealsGrid
+                  banners={data.banners}
+                  modalProducts={data.modal_products}
+                />
+              </Suspense>
 
               <div className="h-px w-full mb-20" />
 
