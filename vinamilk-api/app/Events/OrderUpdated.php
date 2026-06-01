@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Events;
+
+use App\Models\Order;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class OrderUpdated implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public $order;
+    public $changes;
+
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(Order $order, array $changes = [])
+    {
+        $this->order = $order;
+        $this->changes = $changes;
+    }
+
+    /**
+     * Get the channels the event should broadcast on.
+     */
+    public function broadcastOn(): array
+    {
+        return [
+            new Channel('admin.orders'),
+            new PrivateChannel('admin.orders.' . $this->order->id),
+        ];
+    }
+
+    /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'order.updated';
+    }
+}
