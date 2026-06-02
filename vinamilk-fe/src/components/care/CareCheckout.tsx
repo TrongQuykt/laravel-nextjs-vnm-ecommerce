@@ -103,6 +103,7 @@ export function CareCheckout({ onBack }: Props) {
         shipping_address: selectedAddress,
         payment_method: paymentMethod,
         invoice_info: isInvoiceEnabled ? invoiceData : null,
+        selected_gifts: [],
       });
       reset();
       if (res.payment_url) {

@@ -13,6 +13,8 @@ use App\Models\MarketingGift;
 use App\Models\Order;
 use App\Models\ProductVariant;
 use App\Models\ShippingMethod;
+use App\Models\StockMovement;
+use App\Models\StockReservation;
 use App\Services\CareService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -80,7 +82,7 @@ class CareController extends Controller
 
     public function checkout(Request $request)
     {
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'care_product_id'       => 'required|exists:care_products,id',
             'variant_id'            => 'required|exists:product_variants,id',
             'quantity'              => 'required|integer|min:1|max:99',
@@ -95,6 +97,14 @@ class CareController extends Controller
             'selected_gifts'        => 'nullable|array',
             'selected_gifts.*'      => 'array',
         ]);
+
+        if ($validator->fails()) {
+            \Log::error('Care checkout validation failed', [
+                'errors' => $validator->errors()->toArray(),
+                'input' => $request->all(),
+            ]);
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        }
 
         if ($request->boolean('include_greeting_card') && !$request->greeting_card_id) {
             return response()->json(['message' => 'Vui lòng chọn lời nhắn thiệp hoặc tắt thiệp đính kèm.'], 422);
@@ -329,8 +339,13 @@ class CareController extends Controller
                 ]);
             }
 
-            // Decrement stock once for the whole subscription
-            $variant->decrement('stock_quantity', $totalQty);
+            // Reserve stock using StockService for proper reservation flow
+            app(\App\Services\StockService::class)->reserveStock(
+                $variant->id,
+                $totalQty,
+                $orderNumber,
+                $deliveryCount * 30 * 24 // timeout in minutes (months * days * hours)
+            );
 
             $paymentUrl = null;
             try {

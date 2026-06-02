@@ -82,6 +82,7 @@ class StockReservationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['productVariant.volume', 'productVariant.packagingType']))
             ->columns([
                 TextColumn::make('id')
                     ->label('ID')
@@ -89,9 +90,13 @@ class StockReservationResource extends Resource
                 TextColumn::make('productVariant.product.name')
                     ->label('Sản phẩm')
                     ->searchable(),
-                TextColumn::make('productVariant.name')
+                TextColumn::make('variant_display_name')
                     ->label('Biến thể')
-                    ->searchable(),
+                    ->searchable(query: function ($query, $search) {
+                        $query->whereHas('productVariant', function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%");
+                        });
+                    }),
                 TextColumn::make('order_number')
                     ->label('Mã đơn hàng')
                     ->searchable()

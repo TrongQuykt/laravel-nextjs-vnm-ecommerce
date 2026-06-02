@@ -66,6 +66,8 @@ Route::prefix('v1')->group(function () {
     // Content
     Route::get('/blogs', [BlogController::class, 'index']);
     Route::get('/blogs/{slug}', [BlogController::class, 'show']);
+    Route::get('/events-news', [\App\Http\Controllers\Api\EventNewsController::class, 'index']);
+    Route::get('/events-news/{slug}', [\App\Http\Controllers\Api\EventNewsController::class, 'show']);
     Route::get('/banners', function () {
         return \App\Models\Banner::where('is_active', true)->orderBy('sort_order')->get();
     });

@@ -15,6 +15,10 @@ class StockReservation extends Model
         'status',
     ];
 
+    protected $appends = [
+        'variant_display_name',
+    ];
+
     protected $casts = [
         'reserved_at' => 'datetime',
         'expires_at' => 'datetime',
@@ -59,5 +63,20 @@ class StockReservation extends Model
     public function scopeExpired($query)
     {
         return $query->where('status', 'pending')->where('expires_at', '<', now());
+    }
+
+    /**
+     * Get variant display name (volume + packaging type)
+     */
+    public function getVariantDisplayNameAttribute(): string
+    {
+        $variant = $this->productVariant;
+        if (!$variant) return '';
+        
+        $volume = $variant->volume?->name ?? '';
+        $packaging = $variant->packagingType?->name ?? '';
+        
+        $parts = array_filter([$volume, $packaging]);
+        return !empty($parts) ? implode(' - ', $parts) : $variant->name;
     }
 }

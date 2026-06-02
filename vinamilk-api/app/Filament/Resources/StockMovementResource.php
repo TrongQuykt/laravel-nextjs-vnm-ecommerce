@@ -86,6 +86,7 @@ class StockMovementResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['productVariant.volume', 'productVariant.packagingType']))
             ->columns([
                 TextColumn::make('id')
                     ->label('ID')
@@ -93,9 +94,13 @@ class StockMovementResource extends Resource
                 TextColumn::make('productVariant.product.name')
                     ->label('Sản phẩm')
                     ->searchable(),
-                TextColumn::make('productVariant.name')
+                TextColumn::make('variant_display_name')
                     ->label('Biến thể')
-                    ->searchable(),
+                    ->searchable(query: function ($query, $search) {
+                        $query->whereHas('productVariant', function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%");
+                        });
+                    }),
                 TextColumn::make('quantity')
                     ->label('Số lượng')
                     ->sortable()
@@ -104,20 +109,46 @@ class StockMovementResource extends Resource
                     ->label('Loại')
                     ->colors([
                         'success' => 'import',
-                        'danger' => 'export',
+                        'danger' => fn ($state) => in_array($state, ['export', 'damage']),
                         'warning' => 'reservation',
                         'info' => 'release',
                         'primary' => 'adjustment',
                         'secondary' => 'return',
-                        'danger' => 'damage',
                         'gray' => 'transfer',
                     ]),
                 TextColumn::make('reference_type')
                     ->label('Loại tham chiếu')
-                    ->searchable(),
+                    ->searchable()
+                    ->formatStateUsing(function ($state) {
+                        if (str_contains($state, 'CareSubscription')) {
+                            return 'Care Subscription';
+                        }
+                        if (str_contains($state, 'Order')) {
+                            return 'Đơn hàng';
+                        }
+                        if ($state === 'order') {
+                            return 'Đơn hàng';
+                        }
+                        if ($state === 'purchase_order') {
+                            return 'Đơn nhập';
+                        }
+                        if ($state === 'adjustment') {
+                            return 'Điều chỉnh';
+                        }
+                        return class_basename($state);
+                    }),
                 TextColumn::make('reference_id')
                     ->label('ID tham chiếu')
-                    ->searchable(),
+                    ->searchable()
+                    ->formatStateUsing(function ($record) {
+                        if (str_contains($record->reference_type, 'CareSubscription')) {
+                            $subscription = \App\Models\CareSubscription::find($record->reference_id);
+                            if ($subscription && $subscription->paymentOrder) {
+                                return $subscription->paymentOrder->order_number;
+                            }
+                        }
+                        return $record->reference_id;
+                    }),
                 TextColumn::make('user.name')
                     ->label('Người thực hiện')
                     ->searchable(),

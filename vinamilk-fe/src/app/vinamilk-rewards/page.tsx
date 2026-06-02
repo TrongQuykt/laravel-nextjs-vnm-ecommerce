@@ -293,7 +293,7 @@ export default function RewardsPage() {
                                 {[...Array(25)].map((_, i) => <div key={i} className="w-2 h-4 bg-white rounded-full -mb-3"></div>)}
                             </div>
                         </div>
-                        <div className="flex-1 overflow-y-auto px-8 py-10 custom-scrollbar bg-[#fffff1]">
+                        <div className="flex-1 overflow-y-auto px-8 py-10 navy-scrollbar bg-[#fffff1]">
                             <div className="flex items-center gap-3 mb-8">
                                 <span className="text-[13px] font-bold whitespace-nowrap">{selectedReward.points_required.toLocaleString()} Điểm</span>
                                 <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -341,9 +341,9 @@ export default function RewardsPage() {
             <style jsx>{`
                 @keyframes slide-left { from { transform: translateX(100%); } to { transform: translateX(0); } }
                 .animate-slide-left { animation: slide-left 0.3s ease-out; }
-                .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: #f8f8f8; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+                .navy-scrollbar::-webkit-scrollbar { width: 5px; }
+                .navy-scrollbar::-webkit-scrollbar-track { background: #f8f8f8; }
+                .navy-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
             `}</style>
         </div>
     );

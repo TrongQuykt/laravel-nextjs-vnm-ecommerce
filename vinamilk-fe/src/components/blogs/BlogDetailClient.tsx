@@ -18,9 +18,10 @@ import { motion } from 'framer-motion';
 interface BlogDetailClientProps {
   post: BlogPost;
   relatedPosts: BlogPost[];
+  isEventNews?: boolean;
 }
 
-const BlogDetailClient: React.FC<BlogDetailClientProps> = ({ post, relatedPosts }) => {
+const BlogDetailClient: React.FC<BlogDetailClientProps> = ({ post, relatedPosts, isEventNews = false }) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -31,17 +32,36 @@ const BlogDetailClient: React.FC<BlogDetailClientProps> = ({ post, relatedPosts 
   const processedContent = useMemo(() => {
     const content = post.content || '';
     if (!isMounted) return content;
-    
+
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, 'text/html');
+
+    // Remove captions from images
+    const figcaptions = doc.querySelectorAll('figcaption');
+    figcaptions.forEach(figcaption => {
+      figcaption.remove();
+    });
+
+    // Remove links from images and prevent click behavior
+    const images = doc.querySelectorAll('img');
+    images.forEach(img => {
+      // Remove parent anchor tags if they exist
+      const parentAnchor = img.closest('a');
+      if (parentAnchor) {
+        parentAnchor.replaceWith(img);
+      }
+      // Add pointer-events-none to prevent clicking
+      img.style.pointerEvents = 'none';
+    });
+
     const headings = doc.querySelectorAll('h2, h3');
-    
+
     headings.forEach((heading, index) => {
       const text = heading.textContent || '';
       const id = text.toLowerCase().replace(/\s+/g, '-') + '-' + index;
       heading.id = id;
     });
-    
+
     return doc.body.innerHTML;
   }, [post.content, isMounted]);
 
@@ -56,53 +76,57 @@ const BlogDetailClient: React.FC<BlogDetailClientProps> = ({ post, relatedPosts 
     : '/images/placeholder-blog.jpg';
 
   return (
-    <main className="min-h-screen bg-[#FDFCF0] pb-20 pt-40">
+    <main className="min-h-screen bg-[#FDFCF0] pb-20 pt-38">
       {/* Breadcrumbs */}
-      <div className="max-w-[1440px] mx-auto px-10 md:px-20 pt-6">
+      <div className="max-w-[1440px] mx-auto px-10 md:px-20 pt-4">
         <nav className="flex items-center space-x-2 text-[11px] font-bold text-[#002094] uppercase tracking-tighter opacity-60">
           <Link href="/" className="hover:opacity-100">
             <Home className="w-3.5 h-3.5" />
           </Link>
           <ChevronRight className="w-3 h-3 opacity-30" />
-          <Link href="/tin-tuc" className="hover:opacity-100">Luôn vui khỏe</Link>
+          <Link href={isEventNews ? "/events-news" : "/tin-tuc"} className="hover:opacity-100">{isEventNews ? "Tin sự kiện" : "Luôn vui khỏe"}</Link>
           <ChevronRight className="w-3 h-3 opacity-30" />
           <span className="opacity-100 line-clamp-1">{post.title}</span>
         </nav>
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-10 md:px-20 mt-12">
+      <div className="max-w-[1440px] mx-auto px-10 md:px-20 mt-8">
         <div className="flex flex-col lg:flex-row gap-16 relative">
-          {/* Sidebar - Left Column */}
-          <aside className="lg:w-1/4">
-            <div className="sticky top-32">
-              <div className="bg-[#E9EDF5] rounded-t-xl overflow-hidden shadow-sm zigzag-bottom pb-4">
-                {/* TOC Header - Blog Title */}
-                <div className="p-5 border-b border-[#002094]/10">
-                  <h4 className="text-[#002094] text-xs font-black uppercase leading-tight tracking-tight">
-                    {post.title}
-                  </h4>
+          {/* Sidebar - Left Column - Hide for event news */}
+          {!isEventNews && (
+            <aside className="lg:w-1/4">
+              <div className="sticky top-32">
+                <div className="bg-[#E9EDF5] rounded-t-xl overflow-hidden shadow-sm zigzag-bottom pb-4">
+                  {/* TOC Header - Blog Title */}
+                  <div className="p-5 border-b border-[#002094]/10">
+                    <h4 className="text-[#002094] text-xs font-black uppercase leading-tight tracking-tight">
+                      {post.title}
+                    </h4>
+                  </div>
+
+                  {/* TOC List */}
+                  <div className="max-h-[66vh] overflow-y-auto scrollbar-hide px-2 py-4">
+                    <TableOfContents content={post.content || ''} />
+                  </div>
                 </div>
-                
-                {/* TOC List */}
-                <div className="max-h-[66vh] overflow-y-auto scrollbar-hide px-2 py-4">
-                  <TableOfContents content={post.content || ''} />
-                </div>
+
+                {/* [NEW] Sidebar Products - Ảnh #1 */}
+                <BlogSidebarProducts products={post.products || []} />
+
+                {/* [NEW] Suggested Blogs - Ảnh #3 */}
+                <BlogSidebarRelatedPosts posts={relatedPosts || []} />
               </div>
+            </aside>
+          )}
 
-              {/* [NEW] Sidebar Products - Ảnh #1 */}
-              <BlogSidebarProducts products={post.products || []} />
-
-              {/* [NEW] Suggested Blogs - Ảnh #3 */}
-              <BlogSidebarRelatedPosts posts={relatedPosts || []} />
-            </div>
-          </aside>
-
-          {/* Main Content - Right Column */}
-          <article className="lg:w-3/4">
+          {/* Main Content - Right Column - Full width for event news */}
+          <article className={isEventNews ? "lg:w-full" : "lg:w-3/4"}>
             <div className="mb-10">
-              <span className="text-[#002094] text-[11px] font-black uppercase tracking-widest mb-4 block">
-                {post.category?.name || 'TIN TỨC'}
-              </span>
+              {!isEventNews && (
+                <span className="text-[#002094] text-[11px] font-black uppercase tracking-widest mb-4 block">
+                  {post.category?.name || 'TIN TỨC'}
+                </span>
+              )}
               <h1 className="text-4xl md:text-5xl font-black text-[#002094] leading-[1.1] mb-6 tracking-tight">
                 {post.title}
               </h1>
@@ -113,17 +137,7 @@ const BlogDetailClient: React.FC<BlogDetailClientProps> = ({ post, relatedPosts 
               </div>
             </div>
 
-            {/* Banner */}
-            {bannerUrl && (
-              <div className="relative aspect-[21/9] rounded-2xl overflow-hidden mb-12 shadow-sm">
-                <Image 
-                  src={bannerUrl} 
-                  alt={post.title} 
-                  fill 
-                  className="object-cover"
-                />
-              </div>
-            )}
+           
 
             {/* Content Body with [PRODUCT] Injection - Ảnh #2 */}
             <div className="prose prose-lg max-w-none prose-headings:text-[#002094] prose-headings:font-black prose-h2:text-5xl prose-h3:text-2xl prose-p:text-[#002094] prose-p:opacity-90 prose-img:rounded-2xl prose-img:mx-auto prose-figcaption:text-center prose-figcaption:text-sm prose-figcaption:text-gray-500 prose-figcaption:mt-3 prose-figcaption:font-medium">

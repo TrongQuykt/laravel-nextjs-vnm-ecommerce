@@ -17,6 +17,10 @@ class StockMovement extends Model
         'user_id',
     ];
 
+    protected $appends = [
+        'variant_display_name',
+    ];
+
     protected $casts = [
         'quantity' => 'integer',
     ];
@@ -83,5 +87,20 @@ class StockMovement extends Model
     public function scopeByReference($query, $type, $id)
     {
         return $query->where('reference_type', $type)->where('reference_id', $id);
+    }
+
+    /**
+     * Get variant display name (volume + packaging type)
+     */
+    public function getVariantDisplayNameAttribute(): string
+    {
+        $variant = $this->productVariant;
+        if (!$variant) return '';
+        
+        $volume = $variant->volume?->name ?? '';
+        $packaging = $variant->packagingType?->name ?? '';
+        
+        $parts = array_filter([$volume, $packaging]);
+        return !empty($parts) ? implode(' - ', $parts) : $variant->name;
     }
 }
